@@ -51,11 +51,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         equation,
-                        style: TextStyle(fontSize: 20, color: Colors.black54),
+                        style: TextStyle(fontSize: 21, color: Colors.black54),
                         maxLines: 25,
                       ),
                       SizedBox(
-                        height: 15,
+                        height: 40,
                       ),
                       Text(finalResult,
                           style: TextStyle(
@@ -66,9 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              flex: 3,
+              flex:3,
               child: Container(
-                padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: GridView.builder(
                   itemCount: buttons.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -116,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       );
+
+                      // equal button
                     } else if (index == 18) {
                       return MyButtons(
                         buttonText: buttons[index],
@@ -127,6 +129,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       );
+
+                      // percentage button
                     } else if (index == 2) {
                       return MyButtons(
                         buttonText: buttons[index],
@@ -138,6 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       );
+
+                      // divide button
                     }
                     return MyButtons(
                       buttonText: buttons[index],
@@ -174,44 +180,72 @@ class _HomeScreenState extends State<HomeScreen> {
   void equationResult() {
     String finalEquation = equation;
     finalEquation = finalEquation.replaceAll("x", "*");
-    Parser p = Parser();
-    Expression exp = p.parse(finalEquation);
-    double result = exp.evaluate(EvaluationType.REAL, null);
-    finalResult = result.toString();
+    int lastOperatorIndex = lastOperator();
+    if (finalEquation[finalEquation.length - 1] == "0" &&
+        finalEquation[lastOperatorIndex] == "/") {
+      finalResult = "Can't divide by Zero";
+    } else {
+      Parser p = Parser();
+      Expression exp = p.parse(finalEquation);
+      double result = exp.evaluate(EvaluationType.REAL, null);
+      finalResult = result.toString();
+    }
   }
 
+  // plus and minus button
   void plusMinus() {
-    int lastOp;
-    List op = ["+", "-", "*", "/"];
-    for (int i = equation.length - 1; i > 0; i--) {
-      if (op.contains(equation[i])) {
-        lastOp = i;
-        break;
+    int lastOperatorIndex;
+    int number;
+
+    List<String> op = ["+", "-", "x", "/"];
+    if (equation.contains(RegExp(r'^-?\d[\d ]*$'))) {
+      number = int.parse(equation);
+      number = number * -1;
+      equation = number.toString();
+    } else {
+      
+      lastOperatorIndex = lastOperator();
+      if (equation[lastOperatorIndex] == "-") {
+        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        // number = number * -1;
+        equation = equation.replaceAll(
+            equation.substring(lastOperatorIndex, equation.length),
+            ("+" + number.toString()));
+      } else if (equation[lastOperatorIndex] == "+") {
+        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = number * -1;
+        equation =
+            equation.replaceAll(equation.substring(lastOperatorIndex), number.toString());
+      } else {
+        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = number * -1;
+        equation = equation.substring(0, lastOperatorIndex + 1) + number.toString();
       }
     }
-    if (equation[lastOp] == "-") {
-      equation = equation.replaceAll("-", "+");
-    } else if (equation[lastOp] == "+") {
-      equation = equation.replaceAll("-", "+");
-    } else if (equation[lastOp] == "x" || equation[lastOp] == "/") {
-      equation = equation.substring(0, lastOp + 1) +
-          "-" +
-          equation.substring(lastOp + 1);
-    }
   }
 
+  // percentage button
   void percent() {
-    int lastOp;
-    String num = "";
-    List op = ["+", "-", "*", "/"];
+    double num1;
+    int lastOperatorIndex = lastOperator();
+    num1 = double.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+    equation = equation.substring(0, lastOperatorIndex + 1) +
+        equation.substring(lastOperatorIndex + 1, equation.length) +
+        "%";
+    num1 = num1 / 100;
+    equation = equation.replaceAll(
+        equation.substring(lastOperatorIndex + 1, equation.length), num1.toString());
+  }
+
+  int lastOperator() {
+    int lastOperatorIndex;
+    List op = ["+", "-", "x", "/"];
     for (int i = equation.length - 1; i >= 0; i--) {
       if (op.contains(equation[i])) {
-        lastOp = i;
+        lastOperatorIndex = i;
         break;
       }
     }
-    num = equation.substring(lastOp, equation.length - 1);
-    double num1 = double.parse(num) * 100;
-    finalResult += num1.toString();
+    return lastOperatorIndex;
   }
 }
