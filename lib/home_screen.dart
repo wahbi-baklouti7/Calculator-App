@@ -1,6 +1,7 @@
 import 'package:math_expressions/math_expressions.dart';
 import 'package:flutter/material.dart';
 import 'button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -41,9 +42,33 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.all(6),
+                  alignment: Alignment.center,
+                  width: 130,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Color(0xFFE9F0F4),
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                          icon: Icon(FontAwesomeIcons.moon), onPressed: () {}),
+                      IconButton(
+                          icon: Icon(FontAwesomeIcons.sun), onPressed: () {}),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             Expanded(
+              flex: 1,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(6, 10, 5, 0),
+                padding: const EdgeInsets.fromLTRB(6, 0, 5, 20),
                 child: Container(
                   alignment: Alignment.topRight,
                   child: Column(
@@ -51,11 +76,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         equation,
-                        style: TextStyle(fontSize: 21, color: Colors.black54),
+                        style: TextStyle(fontSize: 20, color: Colors.black54),
                         maxLines: 25,
                       ),
                       SizedBox(
-                        height: 40,
+                        height: 10,
                       ),
                       Text(finalResult,
                           style: TextStyle(
@@ -66,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              flex:3,
+              flex: 4,
               child: Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: GridView.builder(
@@ -203,23 +228,26 @@ class _HomeScreenState extends State<HomeScreen> {
       number = number * -1;
       equation = number.toString();
     } else {
-      
       lastOperatorIndex = lastOperator();
       if (equation[lastOperatorIndex] == "-") {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
         // number = number * -1;
         equation = equation.replaceAll(
             equation.substring(lastOperatorIndex, equation.length),
             ("+" + number.toString()));
       } else if (equation[lastOperatorIndex] == "+") {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
+        number = number * -1;
+        equation = equation.replaceAll(
+            equation.substring(lastOperatorIndex), number.toString());
+      } else {
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
         number = number * -1;
         equation =
-            equation.replaceAll(equation.substring(lastOperatorIndex), number.toString());
-      } else {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
-        number = number * -1;
-        equation = equation.substring(0, lastOperatorIndex + 1) + number.toString();
+            equation.substring(0, lastOperatorIndex + 1) + number.toString();
       }
     }
   }
@@ -228,13 +256,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void percent() {
     double num1;
     int lastOperatorIndex = lastOperator();
-    num1 = double.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+    num1 = double.parse(
+        equation.substring(lastOperatorIndex + 1, equation.length));
     equation = equation.substring(0, lastOperatorIndex + 1) +
         equation.substring(lastOperatorIndex + 1, equation.length) +
         "%";
     num1 = num1 / 100;
     equation = equation.replaceAll(
-        equation.substring(lastOperatorIndex + 1, equation.length), num1.toString());
+        equation.substring(lastOperatorIndex + 1, equation.length),
+        num1.toString());
   }
 
   int lastOperator() {
