@@ -176,8 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       );
-
-                      // equal button
                     } else if (index == 18) {
                       return MyButtons(
                         buttonText: buttons[index],
@@ -202,8 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       );
-
-                      
                     }
                     return MyButtons(
                       buttonText: buttons[index],
@@ -248,7 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
       Parser p = Parser();
       Expression exp = p.parse(finalEquation);
       double result = exp.evaluate(EvaluationType.REAL, null);
-      finalResult = result.toString().substring(0,16);
+      finalResult = result.toString();
+      if (finalResult.length > 16) {
+        finalResult = finalResult.substring(0, 16);
+      } 
     }
   }
 
