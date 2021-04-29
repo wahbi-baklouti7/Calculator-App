@@ -1,6 +1,7 @@
 import 'package:math_expressions/math_expressions.dart';
 import 'package:flutter/material.dart';
 import 'button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,6 +11,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String finalResult = "0";
   String equation = "";
+  var buttonColor = Color(0xFFE9F0F4);
+  var buttonTextColor = Colors.black;
+  var backColor = Colors.white;
+  var calcColor = Colors.white;
+  var moonColor = Colors.black12;
+  var sunColor = Colors.black;
 
   List<String> buttons = [
     "C",
@@ -37,38 +44,91 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backColor,
       body: SafeArea(
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.all(6),
+                  alignment: Alignment.center,
+                  width: 130,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: buttonColor,
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // dark mode
+                      IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.moon,
+                            color: moonColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              darkMode();
+                            });
+                          }),
+
+                      // light moon
+                      IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.sun,
+                            color: sunColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              lightMode();
+                            });
+                          }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             Expanded(
+              flex: 1,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(6, 10, 5, 0),
+                padding: const EdgeInsets.fromLTRB(6, 0, 5, 0),
                 child: Container(
+                  // foregroundDecoration: BoxDecoration(color: resultColor),
+                  color: backColor,
                   alignment: Alignment.topRight,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         equation,
-                        style: TextStyle(fontSize: 21, color: Colors.black54),
+                        style: TextStyle(fontSize: 18, color: buttonTextColor),
                         maxLines: 25,
                       ),
                       SizedBox(
-                        height: 40,
+                        height: 10,
                       ),
                       Text(finalResult,
                           style: TextStyle(
-                              fontSize: 45, fontWeight: FontWeight.w800)),
+                              color: buttonTextColor,
+                              fontSize: 39,
+                              fontWeight: FontWeight.w800)),
                     ],
                   ),
                 ),
               ),
             ),
             Expanded(
-              flex:3,
+              flex: 4,
               child: Container(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(35),
+                        topRight: Radius.circular(35)),
+                    color: calcColor),
+                // color: Colors.black54,
+                padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
                 child: GridView.builder(
                   itemCount: buttons.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -121,8 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else if (index == 18) {
                       return MyButtons(
                         buttonText: buttons[index],
-                        textColor: Colors.black,
-                        buttonColor: Color(0xFFE9F0F4),
+                        textColor: buttonTextColor,
+                        buttonColor: buttonColor,
                         buttonTap: () {
                           setState(() {
                             plusMinus();
@@ -134,8 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else if (index == 2) {
                       return MyButtons(
                         buttonText: buttons[index],
-                        textColor: Colors.black,
-                        buttonColor: Color(0xFFE9F0F4),
+                        textColor: buttonTextColor,
+                        buttonColor: buttonColor,
                         buttonTap: () {
                           setState(() {
                             percent();
@@ -143,16 +203,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
 
-                      // divide button
+                      
                     }
                     return MyButtons(
                       buttonText: buttons[index],
                       buttonColor: isOperator(buttons[index])
                           ? Color(0xFFFF9500)
-                          : Color(0xFFE9F0F4),
+                          : buttonColor,
                       textColor: isOperator(buttons[index])
                           ? Colors.white
-                          : Colors.black,
+                          : buttonTextColor,
                       buttonTap: () {
                         setState(() {
                           equation += buttons[index];
@@ -188,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Parser p = Parser();
       Expression exp = p.parse(finalEquation);
       double result = exp.evaluate(EvaluationType.REAL, null);
-      finalResult = result.toString();
+      finalResult = result.toString().substring(0,16);
     }
   }
 
@@ -203,23 +263,26 @@ class _HomeScreenState extends State<HomeScreen> {
       number = number * -1;
       equation = number.toString();
     } else {
-      
       lastOperatorIndex = lastOperator();
       if (equation[lastOperatorIndex] == "-") {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
         // number = number * -1;
         equation = equation.replaceAll(
             equation.substring(lastOperatorIndex, equation.length),
             ("+" + number.toString()));
       } else if (equation[lastOperatorIndex] == "+") {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
+        number = number * -1;
+        equation = equation.replaceAll(
+            equation.substring(lastOperatorIndex), number.toString());
+      } else {
+        number = int.parse(
+            equation.substring(lastOperatorIndex + 1, equation.length));
         number = number * -1;
         equation =
-            equation.replaceAll(equation.substring(lastOperatorIndex), number.toString());
-      } else {
-        number = int.parse(equation.substring(lastOperatorIndex + 1, equation.length));
-        number = number * -1;
-        equation = equation.substring(0, lastOperatorIndex + 1) + number.toString();
+            equation.substring(0, lastOperatorIndex + 1) + number.toString();
       }
     }
   }
@@ -228,13 +291,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void percent() {
     double num1;
     int lastOperatorIndex = lastOperator();
-    num1 = double.parse(equation.substring(lastOperatorIndex + 1, equation.length));
+    num1 = double.parse(
+        equation.substring(lastOperatorIndex + 1, equation.length));
     equation = equation.substring(0, lastOperatorIndex + 1) +
         equation.substring(lastOperatorIndex + 1, equation.length) +
         "%";
     num1 = num1 / 100;
     equation = equation.replaceAll(
-        equation.substring(lastOperatorIndex + 1, equation.length), num1.toString());
+        equation.substring(lastOperatorIndex + 1, equation.length),
+        num1.toString());
   }
 
   int lastOperator() {
@@ -247,5 +312,23 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     return lastOperatorIndex;
+  }
+
+  void darkMode() {
+    buttonColor = Colors.black87;
+    buttonTextColor = Colors.white;
+    backColor = Color(0xFF2B2F37);
+    calcColor = Color(0xFF22252D);
+    moonColor = Colors.white;
+    sunColor = Colors.white12;
+  }
+
+  void lightMode() {
+    buttonColor = Color(0xFFE9F0F4);
+    buttonTextColor = Colors.black;
+    backColor = Colors.white;
+    calcColor = Colors.white;
+    moonColor = Colors.black12;
+    sunColor = Colors.black;
   }
 }
